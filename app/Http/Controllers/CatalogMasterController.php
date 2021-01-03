@@ -18,7 +18,7 @@ use File;
 class CatalogMasterController extends Controller
 {
      public function __construct(Request $request)
-    {     
+    {
         $this->CommonController = new CommonController();
     }
 
@@ -35,7 +35,7 @@ class CatalogMasterController extends Controller
         return view('catalogmaster.index',compact('data'));
     }
 
-   
+
     public function create()
     {
         $data = MachineCategoryMaster::where('MachineCategoryStatus',1)->get();
@@ -43,7 +43,7 @@ class CatalogMasterController extends Controller
 
     }
 
-    
+
     public function store(Request $request)
     {
 
@@ -52,7 +52,7 @@ class CatalogMasterController extends Controller
                                             'MachineSubcategoryId' => ['required'],
                                             'MachineId' => ['required'],
                                             'CatalogDescription' => ['required', 'string', 'max:255'],
-                                            'CatalogFile' => ['required','mimes:pdf','max:10240'],
+                                            'CatalogFile' => ['required','mimes:pdf','max:100240'],
                                             ]);
         $CatalogFile = $this->CommonController->upload_image($request->file('CatalogFile'), "CatalogFile");
         for($i = 0; $i < count($request->MachineId); $i++)
@@ -64,26 +64,26 @@ class CatalogMasterController extends Controller
                                'CatalogDescription' => $request->CatalogDescription,
                                'CatalogFile' => $CatalogFile ]);
         }
-        
+
         Session::flash('message', 'Your Data save Successfully');
         return redirect()->action('CatalogMasterController@index');
     }
 
-   
+
     public function show(CatalogMaster $catalogMaster)
     {
         //
     }
 
-    
+
     public function edit($CatalogId)
-    {   
+    {
         $data = CatalogMaster::where('CatalogId',$CatalogId)->get();
         $data1 = MachineCategoryMaster::where('MachineCategoryStatus',1)->get();
         return view('catalogmaster.edit_catalog_master', compact('data', 'data1'));
     }
 
-    
+
     public function update(Request $request, $CatalogId)
     {
         $validatedData = $request->validate([
@@ -91,9 +91,9 @@ class CatalogMasterController extends Controller
                                             'MachineSubcategoryId' => ['required'],
                                             'MachineId' => ['required'],
                                             'CatalogDescription' => ['required', 'string', 'max:255'], ]);
-        
+
         $CatalogFile = $request->file('CatalogFile');
-        
+
         if($CatalogFile == '')
         {
            DB::table('catalog_master')->where('CatalogId', $CatalogId)
@@ -108,8 +108,8 @@ class CatalogMasterController extends Controller
             $validatedData = $request->validate(['CatalogFile' => ['mimes:pdf','max:10240'] ]);
             $data = CatalogMaster::where('CatalogId', $CatalogId)->get();
             $image_path = public_path('/images/CatalogFile/'.$data[0]->CatalogFile);
-            
-            if(File::exists($image_path)) 
+
+            if(File::exists($image_path))
             {
                 File::delete($image_path);
             }
@@ -124,12 +124,12 @@ class CatalogMasterController extends Controller
                         'CatalogDescription' => $request->CatalogDescription,
                         'CatalogFile' => $DocumentsName ]);
         }
-        
+
         Session::flash('message', 'Your Data update Successfully');
         return redirect()->action('CatalogMasterController@index');
     }
 
-    
+
     public function destroy($CatalogId)
     {
         DB::table('catalog_master')
@@ -183,7 +183,7 @@ class CatalogMasterController extends Controller
           }
            elseif ($request->data['type']=='machine subcategory')
            {
-       
+
                $CatalogSubcategoryData=  DB::table('catalog_master')
                ->where('CatalogStatus',1)
                ->where('MachineSubcategoryId',$request->data['MachineSubcategoryId'])
@@ -199,7 +199,7 @@ class CatalogMasterController extends Controller
            }
            elseif ($request->data['type']=='machine')
            {
-       
+
                $CatalogMachineData=  DB::table('catalog_master')
                ->where('CatalogStatus',1)
                ->where('MachineId',$request->data['MachineId'])->get();
@@ -221,7 +221,7 @@ class CatalogMasterController extends Controller
 
     public function validatedUser($data)
     {
-       
+
         return Validator::make($data,[
             'type'=>'required',
             'MachineCategoryId'=>'required_if:type,"machine category"',

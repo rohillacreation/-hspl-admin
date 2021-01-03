@@ -17,44 +17,44 @@ use Session;
 use Route;
 
 class MachineMasterController extends Controller
-{   
+{
 
     public function __construct(Request $request)
-    {     
+    {
         $this->CommonController = new CommonController();
     }
-    
+
     public function index()
-    {   
+    {
          $data = DB::table('machine_master')
-                 ->leftJoin('machine_category_master', 'machine_category_master.MachineCategoryId', '=', 
+                 ->leftJoin('machine_category_master', 'machine_category_master.MachineCategoryId', '=',
                     'machine_master.MachineCategoryId')
-                 ->leftJoin('machine_subcategory_master', 'machine_subcategory_master.MachineSubcategoryId', '=', 
+                 ->leftJoin('machine_subcategory_master', 'machine_subcategory_master.MachineSubcategoryId', '=',
                     'machine_master.MachineSubcategoryId')
-                 ->leftJoin('railways_master', 'railways_master.RailwaysId', '=', 
+                 ->leftJoin('railways_master', 'railways_master.RailwaysId', '=',
                     'machine_master.RailwaysId')
-                 ->leftJoin('devision_master', 'devision_master.DevisionId', '=', 
+                 ->leftJoin('devision_master', 'devision_master.DevisionId', '=',
                     'machine_master.DevisionId')
                  ->leftJoin('organisation_master', 'organisation_master.OrganisationId', '=', 'machine_master.OrganisationId')
                  ->where('machine_master.MachineStatus',1)
                  ->orderBy('machine_master.MachineId', 'desc')
                  ->get();
-        
+
 
         return view('machinemaster.index',compact('data'));
     }
 
-   
+
     public function create()
-    {   
+    {
         $MachineCategory = MachineCategoryMaster::where('MachineCategoryStatus',1)->get();
         $Railways = RailwaysMaster::where('RailwaysStatus',1)->get();
         $Organisation=OrganisationMaster::where('OrganisationStatus',1)->get();
         return view('machinemaster.add_machine_master',compact('MachineCategory', 'Railways', 'Organisation'));
     }
-   
+
     public function store(Request $request)
-    {   
+    {
 
          $validateData = $request->validate([
                                           'OrganisationId'=>['required'],
@@ -89,20 +89,20 @@ class MachineMasterController extends Controller
                                 'MachineWarrantyFrom'=> ($request->MachineWarranty == 'W') ? $request->MachineWarrantyFrom : '',
                                 'MachineWarrantyTo'=> ($request->MachineWarranty == 'W') ? $request->MachineWarrantyTo : '',
                                 'MachineAllotmentDate'=>$request->MachineAllotmentDate,
-                                
+
                               ]);
         Session::flash('message','Your Data Save Successfully');
         return redirect()->action('MachineMasterController@index');
 
     }
 
-    
+
     public function show(MachineMaster $machineMaster)
     {
         //
     }
 
-    
+
     public function edit($MachineId)
     {
         $data = MachineMaster::where('MachineId',$MachineId)->get();
@@ -113,7 +113,7 @@ class MachineMasterController extends Controller
 
     }
 
-    
+
     public function update(Request $request, $MachineId)
     {
         $validateData = $request->validate([
@@ -135,7 +135,7 @@ class MachineMasterController extends Controller
 
                                           ]);
 
-          
+
           DB::table('machine_master')->where('MachineId',$MachineId)
           ->update([
                     'OrganisationId'=>$request->OrganisationId,
@@ -159,7 +159,7 @@ class MachineMasterController extends Controller
 
     }
 
-   
+
     public function destroy($MachineId)
     {
         DB::table('machine_master')
@@ -170,7 +170,7 @@ class MachineMasterController extends Controller
 
     }
 
-    //ajax method 
+    //ajax method
     public function getsubcategory(Request $request)
     {
       $category_id = $request->category_id;
@@ -186,7 +186,7 @@ class MachineMasterController extends Controller
     //APIs
     public function FetchMachineData(Request $request)
     {
-      
+
           $validatorcategory=$this->validatecategory($request->data);
 
         if($validatorcategory->fails())
@@ -210,11 +210,17 @@ class MachineMasterController extends Controller
                     return $this->CommonController->errorResponse('No Data Found',422);
                 }
         }
-        elseif($request->data['type']=='machine subcategory') 
+        elseif($request->data['type']=='machine subcategory')
           {
             $MachineSubcategory = DB::table('machine_master')
-            ->where('MachineStatus',1)
-            ->where('MachineSubcategoryId',$request->data['MachineSubcategoryId'])
+                ->leftJoin('machine_category_master','machine_category_master.MachineCategoryId', '=', 'machine_master.MachineCategoryId')
+                ->leftJoin('machine_subcategory_master','machine_subcategory_master.MachineSubcategoryId', '=', 'machine_master.MachineSubcategoryId')
+                ->leftJoin('railways_master','railways_master.RailwaysId','=','machine_master.RailwaysId')
+                ->leftJoin('devision_master','devision_master.DevisionId','=','machine_master.DevisionId')
+                ->leftJoin('catalog_master','catalog_master.MachineId', '=', 'machine_master.MachineId')
+                ->leftJoin('technical_description','technical_description.MachineId', '=', 'machine_master.MachineId')
+            ->where('machine_master.MachineStatus',1)
+            ->where('machine_master.MachineSubcategoryId',$request->data['MachineSubcategoryId'])
             ->get();
 
             if(count($MachineSubcategory) > 0)
@@ -226,8 +232,8 @@ class MachineMasterController extends Controller
               return $this->CommonController->errorResponse('No Data Found',422);
             }
           }
-        
-        elseif($request->data['type']=='railways') 
+
+        elseif($request->data['type']=='railways')
           {
             $Railways = DB::table('machine_master')
             ->where('MachineStatus',1)
@@ -243,7 +249,7 @@ class MachineMasterController extends Controller
               return $this->CommonController->errorResponse('No Data Found',422);
             }
           }
-          elseif($request->data['type']=='devision') 
+          elseif($request->data['type']=='devision')
           {
             $Division = DB::table('machine_master')
             ->where('MachineStatus',1)
@@ -259,7 +265,7 @@ class MachineMasterController extends Controller
               return $this->CommonController->errorResponse('No Data Found',422);
             }
           }
-          elseif($request->data['type']=='machine') 
+          elseif($request->data['type']=='machine')
           {
             $Machine = DB::table('machine_master')
                       ->leftJoin('machine_category_master','machine_category_master.MachineCategoryId', '=', 'machine_master.MachineCategoryId')
@@ -281,7 +287,7 @@ class MachineMasterController extends Controller
               return $this->CommonController->errorResponse('No Data Found',422);
             }
           }
-          
+
           else
           {
             return $this->CommonController->errorResponse('type Mismatch',422);
@@ -291,7 +297,7 @@ class MachineMasterController extends Controller
 
 
         public function validatecategory($data)
-        
+
         {
             return Validator::make($data, [
                                            'type' => 'required',
@@ -302,5 +308,5 @@ class MachineMasterController extends Controller
                                            'MachineId' => 'required_if:type,"machine"' ]);
         }
 
-        
+
     }

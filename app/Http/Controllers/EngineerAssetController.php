@@ -17,35 +17,35 @@ use Auth;
 class EngineerAssetController extends Controller
 {
     public function __construct(Request $request)
-    {     
+    {
         $this->CommonController = new CommonController();
     }
 
     public function index()
     {
-       
+
             $data = DB::table('engineer_asset')
             ->join('engineer_master', 'engineer_asset.EngineerId', '=', 'engineer_master.EngineerId')
             ->join('asset_category_master', 'asset_category_master.AssetCategoryId', '=', 'engineer_asset.AssetCategoryId')
             ->select('engineer_asset.*', 'engineer_master.EngineerId', 'engineer_master.EngineerName', 'asset_category_master.AssetCategoryId', 'asset_category_master.AssetCategoryName')
-            ->where('engineer_master.AssignTo', Auth()->User()->id)
+//            ->where('engineer_master.AssignTo', Auth()->User()->id)
             ->where('engineer_asset.EngineerAssetStatus',1)
             ->orderBy('engineer_asset.AssetId', 'desc')
             ->get();
-            
+
             return view('engineerasset.index',compact('data'));
     }
 
-    
+
     public function create()
-    {  
+    {
        $data=EngineerMaster::where('EngineerStatus',1)->get();
        $data1=AssetCategoryMaster::where('AssetCategoryStatus',1)->get();
        $data2=EngineerAsset::where('EngineerAssetStatus',1)->get();
-       return view('engineerasset.add_engineer_asset',compact('data','data1','data2'));   
+       return view('engineerasset.add_engineer_asset',compact('data','data1','data2'));
     }
 
-   
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -56,7 +56,7 @@ class EngineerAssetController extends Controller
                                             'ItemDescription' => ['required', 'string', 'max:255'],
                                             'ItemPrice' => ['required', 'numeric', 'min:1'],  ]);
 
-        
+
         EngineerAsset::insert(['EngineerId' => $request->EngineerId,
                                 'AssetCategoryId' => $request->AssetCategoryId,
                                 'AssignDate' => $request->AssignDate,
@@ -69,13 +69,13 @@ class EngineerAssetController extends Controller
 
     }
 
-   
+
     public function show(EngineerAsset $engineerAsset)
     {
         //
     }
 
-    
+
     public function edit($AssetId)
     {
         $data1 = EngineerMaster::where('EngineerStatus',1)->get();
@@ -84,9 +84,9 @@ class EngineerAssetController extends Controller
         return view('engineerasset.edit_engineer_asset', compact('data', 'data1','data2'));
     }
 
-    
+
     public function update(Request $request, $AssetId)
-    {    
+    {
          $validatedData = $request->validate([
                                               'EngineerId' => ['required'],
                                               'AssetCategoryId' => ['required'],
@@ -94,7 +94,7 @@ class EngineerAssetController extends Controller
                                               'ItemSerialNo' => ['required', 'string', 'max:255','min:1'],
                                               'ItemDescription' => ['required', 'string', 'max:255',],
                                               'ItemPrice' => ['required', 'regex:/^\d+(\.\d{1,2})?$/','min:1'],
-                                                
+
                                             ]);
 
          DB::table('engineer_asset')
@@ -110,7 +110,7 @@ class EngineerAssetController extends Controller
          return redirect()->action('EngineerAssetController@index');
     }
 
-   
+
     public function destroy($AssetId)
     {
         DB::table('engineer_asset')->where('AssetId', $AssetId)
@@ -123,7 +123,7 @@ class EngineerAssetController extends Controller
     {
       $validator = $this->validateUser($request->data);
 
-      if ($validator->fails()) 
+      if ($validator->fails())
       {
         return $this->CommonController->errorResponse($validator->messages(), 422);
       }
@@ -135,10 +135,10 @@ class EngineerAssetController extends Controller
             ->where('EngineerId', $request->data['EngineerId'])
             ->get();
             if(count($data) > 0)
-            
-            { 
+
+            {
                 return $this->CommonController->successResponse($data,'Data Fetch Successfully',200);
-                
+
             }
             else
             {
@@ -148,7 +148,7 @@ class EngineerAssetController extends Controller
 
     }
     public function validateUser($data)
-    
+
     {
         return Validator::make($data, [
                                        'EngineerId' => 'required']);

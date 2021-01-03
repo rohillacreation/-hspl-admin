@@ -6,8 +6,6 @@ use App\EngineerMaster;
 use App\EngineerDesignationMaster;
 use App\UserDesignationMaster;
 use Illuminate\Http\Request;
-use App\Http\Controllers\CommonController;
-use App\Http\Controllers\Controller;
 use DB;
 use Illuminate\Support\Facades\Validator;
 use Session;
@@ -19,23 +17,23 @@ use Auth;
 class EngineerMasterController extends Controller
 {
     public function __construct(Request $request)
-    {     
+    {
         $this->CommonController = new CommonController();
     }
 
     public function index()
-    {   
+    {
         $data = DB::table('engineer_master')
                 ->join('engineer_designation_master', 'engineer_designation_master.EngineerDesignationId', '=', 'engineer_master.EngineerDesignation')
                 ->leftJoin('engineer_performance_point', 'engineer_performance_point.EngineerId', '=', 'engineer_master.EngineerId')
-                ->leftJoin('user_location', function($query) 
+                ->leftJoin('user_location', function($query)
                   {
                      $query->on('engineer_master.EngineerId','=','user_location.EngineerId')
                      ->whereRaw('user_location.LocationId IN (select a2.LocationId from user_location as a2 join engineer_master as u2 on u2.EngineerId = a2.EngineerId group by u2.EngineerId)')
                      ->whereRaw('user_location.Latitude IN (select a2.Latitude from user_location as a2 join engineer_master as u2 on u2.EngineerId = a2.EngineerId group by u2.EngineerId)')
                      ->whereRaw('user_location.Longitude IN (select a2.Longitude from user_location as a2 join engineer_master as u2 on u2.EngineerId = a2.EngineerId group by u2.EngineerId)');
                   })
-                ->where('engineer_master.AssignTo', Auth()->User()->id)
+//                ->where('engineer_master.AssignTo', Auth()->User()->id)
                 ->where('engineer_master.EngineerStatus',1)
                 ->orderBy('engineer_master.EngineerId', 'desc')
                 ->groupBy('engineer_master.EngineerId')
@@ -45,7 +43,7 @@ class EngineerMasterController extends Controller
     }
 
     public function create()
-    {   
+    {
         $data1 = EngineerDesignationMaster::where('EngineerDesignationStatus', 1)->get();
         $user = DB::table('users_designation_master')
                 ->join('users', 'users.UserDesignationId', '=', 'users_designation_master.UserDesignationId')
@@ -56,7 +54,7 @@ class EngineerMasterController extends Controller
     }
 
     public function store(Request $request)
-    {   
+    {
         $validatedData = $request->validate([
                                             'EngineerName' => ['required','regex:/^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/','min:2', 'max:255'],
                                             'EngineerDesignation' => ['required'],
@@ -68,7 +66,7 @@ class EngineerMasterController extends Controller
                                             'EngineerCurrentAddress' => ['required', 'string', 'max:255'],
                                             'EngineerDocuments' => ['required','mimes:pdf','max:10240'],
                                             'ProfilePic' => ['required','image','mimes:jpeg,png,jpg,gif,svg','max:2048'],
-                                            'DocumentDescription' => ['required', 'string', 'max:255'], 
+                                            'DocumentDescription' => ['required', 'string', 'max:255'],
                                             'EngineerTotalLeaves'=>['required','numeric','min:1'],
                                             'EarningLeave'=>['required','numeric'],
                                             'SickLeave'=>['required','numeric'],
@@ -91,7 +89,7 @@ class EngineerMasterController extends Controller
                                 'EngineerCurrentAddress' => $request->EngineerCurrentAddress,
                                 'EngineerDocuments' => $EngineerDocuments,
                                 'ProfilePic' => $ProfilePic,
-                                'DocumentDescription' => $request->DocumentDescription, 
+                                'DocumentDescription' => $request->DocumentDescription,
                                 'EngineerTotalLeaves'=>$request->EngineerTotalLeaves,
                                 'EL'=>$request->EarningLeave,
                                 'SL'=>$request->SickLeave,
@@ -102,12 +100,12 @@ class EngineerMasterController extends Controller
         Session::flash('message', 'Your Data save Successfully');
         return redirect()->action('EngineerMasterController@index');
     }
-   
+
     public function show(EngineerMaster $engineerMaster)
     {
         //
     }
-  
+
     public function edit($EngineerId)
     {
         $data1 = EngineerDesignationMaster::where('EngineerDesignationStatus', 1)->get();
@@ -137,7 +135,7 @@ class EngineerMasterController extends Controller
                                             'PersonalLeave'=>['required','numeric'],
                                             'EmployeeId'=>['required'],
                                             'AssignTo'=>['required'] ]);
-        
+
 
         $EngineerDocuments = $request->file('EngineerDocuments');
         $ProfilePic = $request->file('ProfilePic');
@@ -152,7 +150,7 @@ class EngineerMasterController extends Controller
                       'EngineerEmail' => $request->EngineerEmail,
                       'EngineerPermanentAddress' => $request->EngineerPermanentAddress,
                       'EngineerCurrentAddress' => $request->EngineerCurrentAddress,
-                      'DocumentDescription' => $request->DocumentDescription ,  
+                      'DocumentDescription' => $request->DocumentDescription ,
                       'EngineerTotalLeaves'=>$request->EngineerTotalLeaves,
                       'EL'=>$request->EarningLeave,
                       'SL'=>$request->SickLeave,
@@ -165,8 +163,8 @@ class EngineerMasterController extends Controller
             $validatedData = $request->validate(['EngineerDocuments' => ['mimes:pdf','max:10240'] ]);
             $data = EngineerMaster::where('EngineerId', $EngineerId)->get();
             $image_path = public_path('/images/EngineerDocuments/'.$data[0]->EngineerDocuments);
-            
-            if(File::exists($image_path)) 
+
+            if(File::exists($image_path))
             {
                 File::delete($image_path);
             }
@@ -196,8 +194,8 @@ class EngineerMasterController extends Controller
            $validatedData1 = $request->validate(['ProfilePic' => ['image','mimes:jpeg,png,jpg,gif,svg','max:2048'] ]);
             $data1 = EngineerMaster::where('EngineerId', $EngineerId)->get();
             $image_path1 = public_path('/images/ProfilePic/'.$data1[0]->ProfilePic);
-            
-            if(File::exists($image_path1)) 
+
+            if(File::exists($image_path1))
             {
                 File::delete($image_path1);
             }
@@ -219,11 +217,11 @@ class EngineerMasterController extends Controller
                       'SL'=>$request->SickLeave,
                       'PL'=>$request->PersonalLeave,
                       'EmployeeId'=>$request->EmployeeId,
-                      'AssignTo'=>$request->AssignTo  ]); 
+                      'AssignTo'=>$request->AssignTo  ]);
         }
 
         else
-        {   
+        {
             $data = EngineerMaster::where('EngineerId', $EngineerId)->get();
             $validatedData = $request->validate(['EngineerDocuments' => ['mimes:pdf','max:10240'] ]);
             $validatedData1 = $request->validate(['ProfilePic' => ['mimes:pdf'] ]);
@@ -231,18 +229,18 @@ class EngineerMasterController extends Controller
             $DocumentName1 = $this->CommonController->upload_image($ProfilePic, "ProfilePic");
             $image_path = public_path('/images/EngineerDocuments/'.$data[0]->EngineerDocuments);
             $image_path1 = public_path('/images/ProfilePic/'.$data[0]->ProfilePic);
-            
-            if(File::exists($image_path)) 
+
+            if(File::exists($image_path))
             {
                 File::delete($image_path);
             }
 
-            if(File::exists($image_path1)) 
+            if(File::exists($image_path1))
             {
                 File::delete($image_path1);
             }
 
-            
+
 
             DB::table('engineer_master')->where('EngineerId', $EngineerId)
             ->update(['EngineerName' => $request->EngineerName,
@@ -262,12 +260,12 @@ class EngineerMasterController extends Controller
                       'EmployeeId'=>$request->EmployeeId,
                       'AssignTo'=>$request->AssignTo  ]);
         }
-        
+
         Session::flash('message', 'Your Data update Successfully');
         return redirect()->action('EngineerMasterController@index');
     }
 
-    
+
     public function destroy($EngineerId)
     {
         DB::table('engineer_master')->where('EngineerId', $EngineerId)
@@ -277,7 +275,7 @@ class EngineerMasterController extends Controller
     }
 
     public function viewasset(Request $request)
-    {   
+    {
         $engineer = $request->EngineerId;
         $data = DB::table('engineer_master')
                 ->join('engineer_asset','engineer_asset.EngineerId','=','engineer_master.EngineerId')
@@ -289,7 +287,7 @@ class EngineerMasterController extends Controller
     }
 
     public function viewperformance(Request $request)
-    {   
+    {
         $engineer = $request->EngineerId;
         $data1 = DB::table('engineer_performance_point')
                  ->leftJoin('service_master','service_master.EngineerId', '=', 'engineer_performance_point.EngineerId')
@@ -301,14 +299,14 @@ class EngineerMasterController extends Controller
     }
 
     public function viewprofile(Request $request)
-    {   
+    {
         $engineer = $request->EngineerId;
         $data = DB::table('engineer_master')
                 ->where('EngineerId',$engineer)
                 ->where('EngineerStatus',1)
                 ->get();
         return view('engineermaster.image', compact('data'));
-        
+
     }
 
     public function login(Request $request)
@@ -327,10 +325,10 @@ class EngineerMasterController extends Controller
             ->where('EngineerStatus', 1)
             ->where('EngineerEmail', $request->data['EngineerEmail'])
             ->get();
-            
+
             if(count($data) > 0)
-            
-            { 
+
+            {
                 if(Hash::check(($request->data['EngineerPassword']), $data[0]->EngineerPassword))
                 {
                     return $this->CommonController->successResponse($data,'Data Fetch Successfully',200);
@@ -339,7 +337,7 @@ class EngineerMasterController extends Controller
                 {
                     return $this->CommonController->errorResponse('Password is incorrect', 201);
                 }
-                
+
             }
             else
             {
@@ -347,15 +345,25 @@ class EngineerMasterController extends Controller
             }
         }
 
-       
+
     }
 
     public function validateUser($data)
-    
+
     {
         return Validator::make($data, [
                                        'EngineerEmail' => 'required|string|email|max:255',
                                        'EngineerPassword' => 'required|string|min:6', ]);
+    }
+
+    public function updateFcmToken(Request $request)
+    {
+
+        DB::table('engineer_master')->where('EngineerId', $request->EngineerId)
+            ->update(['fcm_token' => $request->token]);
+
+        echo "Success";
+        exit;
     }
 }
 

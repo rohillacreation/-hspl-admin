@@ -1,5 +1,5 @@
- @include('layouts.header')
- @include('layouts.sidebar')
+ <?php echo $__env->make('layouts.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+ <?php echo $__env->make('layouts.sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
  <style type="text/css">
 	th,td
@@ -22,15 +22,15 @@
 	        <div class="col-xs-12">
 	          	<div class="box">
 		            <div class="box-header">
-		            	@if(Session::has('message'))
-		            		<p class="alert {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('message') }}</p>
-		            	@endif
+		            	<?php if(Session::has('message')): ?>
+		            		<p class="alert <?php echo e(Session::get('alert-class', 'alert-info')); ?>"><?php echo e(Session::get('message')); ?></p>
+		            	<?php endif; ?>
 		              	<div class="col-xs-12">
- 	       					<a class="btn btn-success" href="{{ url('/engineer-master/create') }}">Add Engineer Master</a>
+ 	       					<a class="btn btn-success" href="<?php echo e(url('/engineer-master/create')); ?>">Add Engineer Master</a>
         				</div>
 		            </div>
-		            <div class="box-body table-responsive">
-		              	<table id="example" class="table table-striped table-bordered">
+		            <div class="box-body" >
+		              	<table id="example" class="table table-striped table-bordered " >
 			                <thead>
 			                    <tr>
 			                        <th>Sr. No.</th>
@@ -56,51 +56,51 @@
 			                    </tr>
 			                </thead>
 			                <tbody>
-			                  @php $i = 1 @endphp
-			                  @foreach($data as $key)
+			                  <?php $i = 1 ?>
+			                  <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 			                    <tr>
-			                        <td>{{$i++}}</td>
-			                        <td>@if(env('APP_ENV') == 'local')
-			                        	<a href="#" id="{{$key->EngineerId}}" onclick="image(this)"><img src="{{ asset('images/ProfilePic') }}/{{$key->ProfilePic}}" style="width: 50px;height:50px;"></a>
-
-			                        	@else
-			                        	<a href="#" id="{{$key->EngineerId}}" onclick="image(this)"><img src="{{ asset('public/images/ProfilePic') }}/{{$key->ProfilePic}}" style="width: 50px;height:50px;"></a>
-			                        	@endif
+			                        <td><?php echo e($i++); ?></td>
+			                        <td><?php if(env('APP_ENV') == 'local'): ?>
+			                        	<a href="#" id="<?php echo e($key->EngineerId); ?>" onclick="image(this)"><img src="<?php echo e(asset('images/ProfilePic')); ?>/<?php echo e($key->ProfilePic); ?>" style="width: 100%;height: 8%"></a>
+			                        	
+			                        	<?php else: ?>
+			                        	<a href="#" id="<?php echo e($key->EngineerId); ?>" onclick="image(this)"><img src="<?php echo e(asset('public/images/ProfilePic')); ?>/<?php echo e($key->ProfilePic); ?>" style="width: 100%;height: 8%"></a>
+			                        	<?php endif; ?>
 			                        </td>
-			                        <td>{{$key->EmployeeId}}</td>
-			                        <td>{{$key->EngineerName}}</td>
-			                        <td>{{$key->EngineerDesignationName}}</td>
-			                        <td>{{$key->EngineerQualification}}</td>
-			                        <td>{{$key->EngineerMobile}}</td>
-			                        <td>{{$key->EngineerEmail}}</td>
-			                        <td>{{$key->EngineerCurrentAddress}}</td>
+			                        <td><?php echo e($key->EmployeeId); ?></td>
+			                        <td><?php echo e($key->EngineerName); ?></td>
+			                        <td><?php echo e($key->EngineerDesignationName); ?></td>
+			                        <td><?php echo e($key->EngineerQualification); ?></td>
+			                        <td><?php echo e($key->EngineerMobile); ?></td>
+			                        <td><?php echo e($key->EngineerEmail); ?></td>
+			                        <td><?php echo e($key->EngineerCurrentAddress); ?></td>
 			                        <td>
-			                        	<a href="#"  id="{{$key->EngineerId}}" onclick="asset(this)">View Assets</a>
+			                        	<a href="#"  id="<?php echo e($key->EngineerId); ?>" onclick="asset(this)">View Assets</a>
 			                        </td>
 			                        <td>
-			                        	@if(env('APP_ENV') == 'local')
-			                        	<a href="{{ asset('images/EngineerDocuments') }}/{{$key->EngineerDocuments}}" target="_blank">View Docs</a>
-			                        	@else
-			                        	<a href="{{ asset('public/images/EngineerDocuments') }}/{{$key->EngineerDocuments}}" target="_blank">View Docs</a>
-			                        	@endif
+			                        	<?php if(env('APP_ENV') == 'local'): ?>
+			                        	<a href="<?php echo e(asset('images/EngineerDocuments')); ?>/<?php echo e($key->EngineerDocuments); ?>" target="_blank">View Docs</a>
+			                        	<?php else: ?>
+			                        	<a href="<?php echo e(asset('public/images/EngineerDocuments')); ?>/<?php echo e($key->EngineerDocuments); ?>" target="_blank">View Docs</a>
+			                        	<?php endif; ?>
 			                        </td>
-			                        <td><a href="#" id="{{$key->EngineerId}}" onclick="performances(this)">{{$key->Performance}}</a></td>
-			                        <!-- <td>{{$key->DocumentDescription}}</td> -->
-			                        <td>{{$key->EngineerTotalLeaves}}</td>
-			                        <td>{{$key->EL}}</td>
-			                        <td>{{$key->SL}}</td>
-			                        <td>{{$key->PL}}</td>
-			                        <td>{{$key->CL}}</td>
-			                        <td><a target="_blank" href="http://maps.google.com/maps?q={{$key->Latitude}},{{$key->Longitude}}"><i class="fa fa-location-arrow btn btn-info"></i></a></td>
+			                        <td><a href="#" id="<?php echo e($key->EngineerId); ?>" onclick="performances(this)"><?php echo e($key->Performance); ?></a></td>
+			                        <!-- <td><?php echo e($key->DocumentDescription); ?></td> -->
+			                        <td><?php echo e($key->EngineerTotalLeaves); ?></td>
+			                        <td><?php echo e($key->EL); ?></td>
+			                        <td><?php echo e($key->SL); ?></td>
+			                        <td><?php echo e($key->PL); ?></td>
+			                        <td><?php echo e($key->CL); ?></td>
+			                        <td><a target="_blank" href="http://maps.google.com/maps?q=<?php echo e($key->Latitude); ?>,<?php echo e($key->Longitude); ?>"><i class="fa fa-location-arrow btn btn-info"></i></a></td>
 			                        <td style="float: left;padding: 0;">
-			                         <a href="{{ url('/engineer-master') }}/{{$key->EngineerId}}/edit"><i class="fa fa-pencil btn btn-info"></i></a>
-			                         <form method="Post" action="{{url('engineer-master')}}/{{$key->EngineerId}}">
-			                         <input type="hidden" name="_method" value="DELETE">@csrf
+			                         <a href="<?php echo e(url('/engineer-master')); ?>/<?php echo e($key->EngineerId); ?>/edit"><i class="fa fa-pencil btn btn-info"></i></a>
+			                         <form method="Post" action="<?php echo e(url('engineer-master')); ?>/<?php echo e($key->EngineerId); ?>">
+			                         <input type="hidden" name="_method" value="DELETE"><?php echo csrf_field(); ?>
 			                         <button style="transform: translate(40px, -28px);" type="submit" class="fa fa-trash btn btn-danger" onclick="return confirm('Are You Sure You Want to Delete This Entry')"></button>
 			                          </form>
 			                        </td>
-			                    </tr>
-			                  @endforeach
+			                    </tr>	
+			                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 			                </tbody>
               			</table>
 		            </div>
@@ -108,7 +108,7 @@
 	        </div>
     	</div>
 
-
+    	
     	<!-- model start -->
     	<div class="modal fade" id="myModal" role="dialog">
 			<div class="modal-dialog">
@@ -154,11 +154,11 @@
 			          <button type="button" class="close" data-dismiss="modal">&times;</button>
 			          <p class="modal-title">Profile Pic</p>
 			        </div>
-
+			        
 			        <div class="box-body" id="images" style="min-height: 100px">
-
+			        	
 			        </div>
-
+			   
 			        <div class="modal-footer">
 				      	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				    </div>
@@ -170,19 +170,19 @@
 
     </section>
   </div>
-
-@include('layouts.footer')
-@include('layouts.datatable')
+ 
+<?php echo $__env->make('layouts.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php echo $__env->make('layouts.datatable', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
 <script>
-	function asset(e)
+	function asset(e) 
    {
        var EngineerId = e.id;
 
        $.ajax({
 	         url: "/engineer-master/view_asset",
 	         type:'POST',
-	         data:{EngineerId : EngineerId},
+	         data:{EngineerId : EngineerId}, 
 	         success: function(result)
 	         {
 	         	$('#assets').html(result);
@@ -197,9 +197,9 @@
    	$.ajax({
 	         url: "/engineer-master/view_profile",
 	         type:'POST',
-	         data:{EngineerId : EngineerId},
+	         data:{EngineerId : EngineerId}, 
 	         success: function(result)
-	         {
+	         {  
 	         	$('#images').html(result);
 
 	         }
@@ -208,14 +208,14 @@
 
    }
 
-   function performances(e)
+   function performances(e) 
    {
        var EngineerId = e.id;
 
        $.ajax({
 	         url: "/engineer-master/view_performance",
 	         type:'POST',
-	         data:{EngineerId : EngineerId},
+	         data:{EngineerId : EngineerId}, 
 	         success: function(result)
 	         {
 	         	$('#performance').html(result);
@@ -224,4 +224,4 @@
        $('#performancemodel').modal();
    }
 
-</script>
+</script><?php /**PATH E:\public_html\hspl-admin\resources\views/engineermaster/index.blade.php ENDPATH**/ ?>

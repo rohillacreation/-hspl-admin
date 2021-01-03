@@ -22,10 +22,10 @@
 
               <div class="box-body">
                 <div class="row">
-                
+
                         <div class="form-group col-md-3">
                            <label for="MachineType">Machine Type Name</label>
-                           <input type="text" class="form-control @error('MachineType') is-invalid @enderror" id="MachineType" name="MachineType" onkeypress="return /[A-Za-z ]/i.test(event.key)" value="{{ old('MachineType') }}">
+                           <input type="text" class="form-control @error('MachineType') is-invalid @enderror" id="MachineType" name="MachineType"  value="{{ old('MachineType') }}">
                            @error('MachineType')
                            <span class="invalid-feedback" role="alert">
                            <strong>{{ $message }}</strong>

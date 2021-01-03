@@ -37,7 +37,7 @@ Route::resource('/user-designations', 'UserDesignationMasterController');
 Route::resource('/engineer-designation-master', 'EngineerDesignationMasterController');
 //Engineer Designation APIs
 Route::get('/engineerdesignation','EngineerDesignationMasterController@FetchAllDesignations');
-//Engineers Route
+//Engineersengineer-master Route
 Route::resource('/engineer-master', 'EngineerMasterController');
 Route::post('/engineer-master/view_asset', 'EngineerMasterController@viewasset');
 Route::post('/engineer-master/view_profile', 'EngineerMasterController@viewprofile');
@@ -149,3 +149,13 @@ Route::get('/reports/pdffile/{id}','ReportsController@reportspdffiles');
 
 //this route is for User Location
 Route::post('/user_location','LocationController@store');
+Route::post('/get-service-detail','ServiceMasterController@getServiceDetail');
+Route::get('/update-fcm-token','EngineerMasterController@updateFcmToken');
+Route::get('/checking',function () {
+    $push = new \App\PushNotification();
+    $push->sendPushToSingle('', [
+        "body" => "This is a test notification",
+        "title" => "Testing",
+        "icon" => "ic_launcher"
+    ]);
+});

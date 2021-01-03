@@ -1,7 +1,7 @@
  @include('layouts.header')
  @include('layouts.sidebar')
  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
- 
+
  <style type="text/css">
 
 	th,td
@@ -38,10 +38,10 @@
 			                        <th>Machine Name</th>
 			                        <th>Machine Serial Number</th>
 			                        <th>Machine Order Number</th>
+                                    <th>Machine Allotment Date</th>
 			                        <th>Machine Warranty</th>
 			                        <th>Machine Warranty From</th>
 			                        <th>Machine Warranty To</th>
-			                        <th>Machine Allotment Date</th>
 			                        <th>Action</th>
 
 			                    </tr>
@@ -63,11 +63,11 @@
 			                        <td>{{$key->MachineName}}</td>
 			                        <td>{{$key->MachineSerialNumber}}</td>
 			                        <td>{{$key->MachineOrderNo}}</td>
+                                    <td>{{$key->MachineAllotmentDate}}</td>
 			                        <td>{{$key->MachineWarranty}}</td>
 			                        <td>{{$key->MachineWarrantyFrom}}</td>
 			                        <td>{{$key->MachineWarrantyTo}}</td>
-			                        <td>{{$key->MachineAllotmentDate}}</td>
-			                       
+
 			                        <td>
 			                         <a href="{{ url('/machine-master') }}/{{$key->MachineId}}/edit"><i class="fa fa-pencil btn btn-info" style="float: left;"></i></a>
 			                         <form method="Post" action="{{url('machine-master')}}/{{$key->MachineId}}">
@@ -75,7 +75,7 @@
 			                          	<button style="transform: translate(36px, -28px);float: left;" type="submit" class="fa fa-trash btn btn-danger" onclick="return confirm('Are You Sure You Want to Delete This Entry')"></button>
 			                         </form>
 			                        </td>
-			                    </tr>	
+			                    </tr>
 			                  @endforeach
 			                </tbody>
               			</table>
